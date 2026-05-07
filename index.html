@@ -272,7 +272,7 @@
         const START_TIME = new Date('2026-05-05T20:07:55+02:00');
         
         // URL to fetch covered distance from backend
-        const BACKEND_URL = 'https://cdn.jsdelivr.net/gh/Runnatio/ARDA-Performance-Center@main/distance.json';
+        const BACKEND_URL = 'https://api.jsonbin.io/v3/b/69fc9233adc21f119a685c4c/latest';
         
         let lastUpdateTime = null;
         
@@ -323,9 +323,8 @@
         
         async function fetchCoveredDistance() {
     try {
-        const timestamp = Date.now();
 
-        const response = await fetch(`${BACKEND_URL}?t=${timestamp}`, {
+        const response = await fetch(BACKEND_URL, {
             cache: 'no-store'
         });
 
@@ -333,21 +332,26 @@
             throw new Error(`HTTP ${response.status}`);
         }
 
-        const text = await response.text();
+        const data = await response.json();
 
-        // Debugging
-        console.log('RAW RESPONSE:', text);
+        console.log('JSONBin response:', data);
 
-        const data = JSON.parse(text);
+        // JSONBin structure:
+        // data.record.distance
 
-        if (typeof data.distance !== 'number') {
-            throw new Error('distance field missing or invalid');
+        if (
+            !data.record ||
+            typeof data.record.distance !== 'number'
+        ) {
+            throw new Error('Distance field missing or invalid');
         }
 
-        return data.distance;
+        return data.record.distance;
 
     } catch (error) {
+
         console.error('Fetch error:', error);
+
         return null;
     }
 }
@@ -386,10 +390,10 @@
             let paceStatus = 'On Target';
             let paceClass = '—';
             
-            if (neededPaceMinKm < TARGET_PACE_MIN_KM * 1.05) {
+            if (neededPaceMinKm < TARGET_PACE_MIN_KM * 0.95) {
                 paceStatus = 'Behind Pace - Need to Speed Up!';
                 paceClass = 'behind-pace';
-            } else if (neededPaceMinKm > TARGET_PACE_MIN_KM * 0.95) {
+            } else if (neededPaceMinKm > TARGET_PACE_MIN_KM * 1.05) {
                 paceStatus = 'Ahead of Pace - Good Job!';
                 paceClass = 'ahead-pace';
             } else {
