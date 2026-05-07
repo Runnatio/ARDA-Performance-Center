@@ -274,7 +274,7 @@
         // URL to fetch covered distance from backend
         const BACKEND_URL = 'https://api.jsonbin.io/v3/b/69fc9233adc21f119a685c4c/latest';
         
-        let lastUpdateTime = null;
+        
         
         function getElapsedTime() {
             const now = new Date();
@@ -312,16 +312,26 @@
             document.getElementById('autoElapsedTime').textContent = elapsedTime.toFixed(2);
         }
         
-        function updateLastUpdated() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            lastUpdateTime = `${hours}:${minutes}:${seconds}`;
-            document.getElementById('lastUpdated').textContent = lastUpdateTime;
-        }
+        function updateLastUpdated(timestamp) {
+
+    const date = new Date(timestamp);
+
+    const formatted =
+        date.toLocaleString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+
+    document.getElementById('lastUpdated').textContent =
+        formatted;
+}
         
         async function fetchCoveredDistance() {
+
     try {
 
         const response = await fetch(BACKEND_URL, {
@@ -336,15 +346,20 @@
 
         console.log('JSONBin response:', data);
 
-        // JSONBin structure:
-        // data.record.distance
-
+        // Validate structure
         if (
             !data.record ||
             typeof data.record.distance !== 'number'
         ) {
             throw new Error('Distance field missing or invalid');
         }
+
+        // Use backend update timestamp
+        const updatedAt =
+            data.metadata.updatedAt ||
+            data.metadata.createdAt;
+
+        updateLastUpdated(updatedAt);
 
         return data.record.distance;
 
@@ -532,12 +547,12 @@
         async function loadAndDisplayStats() {
             const distance = await fetchCoveredDistance();
             if (distance !== null) {
-                updateLastUpdated();
+                
                 renderStats(distance);
             } else {
                 document.getElementById('statsContainer').innerHTML = `
                     <div class="error">
-                        ⚠️ Unable to load distance data from backend. Please check if <code>distance.json</code> exists in the repository.
+                        ⚠️ Unable to load distance data from JSONBin backend.
                     </div>
                 `;
             }
