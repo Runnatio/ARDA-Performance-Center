@@ -356,15 +356,9 @@
         }
 
         // Use backend update timestamp
-        
-    const updatedAt = data.metadata?.updatedAt;   
-
-    if (updatedAt) {
-        updateLastUpdated(updatedAt);
-    } else {
-        console.warn('No updatedAt found in metadata');
-    }
-
+        const updatedAt =
+            data.metadata.updatedAt ||
+            data.metadata.createdAt;
 
         updateLastUpdated(updatedAt);
 
