@@ -41,44 +41,17 @@
             text-align: center;
             color: #666;
             font-size: 0.9em;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             padding-bottom: 15px;
             border-bottom: 2px solid #eee;
         }
         
-        .input-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #555;
-            font-size: 0.9em;
-        }
-        
-        input {
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
+        .last-updated {
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+            margin-bottom: 25px;
+            font-style: italic;
         }
         
         .stats-grid {
@@ -224,24 +197,6 @@
             color: #155724;
         }
         
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 6px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-            width: 100%;
-            margin-top: 15px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-        }
-        
         .section-title {
             font-size: 1.2em;
             font-weight: 600;
@@ -252,13 +207,25 @@
             border-bottom: 2px solid #667eea;
         }
         
+        .loading {
+            text-align: center;
+            color: #999;
+            font-size: 1.1em;
+            padding: 40px 20px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 900px) {
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
-            }
-            
-            .input-section {
-                grid-template-columns: 1fr;
             }
         }
         
@@ -285,110 +252,15 @@
             <strong>Elapsed Time (Auto-calculated):</strong> <span id="autoElapsedTime">0.00</span> hours
         </div>
         
-        <div class="input-section">
-            <div class="input-group">
-                <label for="coveredDistance">Covered Distance (km)</label>
-                <input type="number" id="coveredDistance" placeholder="0" min="0" max="600" step="0.1">
-            </div>
-            <div style="display: flex; align-items: flex-end;">
-                <button onclick="calculateStats()">Update Stats</button>
-            </div>
+        <div class="last-updated">
+            Last Updated: <span id="lastUpdated">Never</span>
         </div>
         
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Current Pace</div>
-                <div class="stat-value" id="currentPace">0:00</div>
-                <div class="stat-unit">min/km</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Required Pace</div>
-                <div class="stat-value" id="requiredPace">9:36</div>
-                <div class="stat-unit">min/km</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Time Remaining</div>
-                <div class="stat-value" id="timeRemaining">96.00</div>
-                <div class="stat-unit">hours</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Distance Remaining</div>
-                <div class="stat-value" id="distanceRemaining">600.0</div>
-                <div class="stat-unit">km</div>
-            </div>
+        <div id="errorBox"></div>
+        
+        <div id="statsContainer" class="loading">
+            Loading tracker data...
         </div>
-        
-        <table class="performance-table">
-            <thead>
-                <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Total Distance Goal</td>
-                    <td>600.0 km</td>
-                    <td>—</td>
-                </tr>
-                <tr>
-                    <td>Total Time Limit</td>
-                    <td>96 hours</td>
-                    <td>—</td>
-                </tr>
-                <tr>
-                    <td>Target Average Pace</td>
-                    <td>9:36 min/km</td>
-                    <td>—</td>
-                </tr>
-                <tr>
-                    <td>Distance Covered</td>
-                    <td id="tableDistanceCovered">0 km</td>
-                    <td id="tableDistanceStatus">—</td>
-                </tr>
-                <tr>
-                    <td>Time Used</td>
-                    <td id="tableTimeUsed">0 h</td>
-                    <td id="tableTimeStatus">—</td>
-                </tr>
-                <tr>
-                    <td>Needed Pace for Remaining Distance</td>
-                    <td id="tableNeededPace">9:36 min/km</td>
-                    <td id="tablePaceStatus">On Target</td>
-                </tr>
-                <tr>
-                    <td>Pace Difference</td>
-                    <td id="tablePaceDifference">0:00 min/km</td>
-                    <td id="tablePaceClass">—</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <div style="margin-bottom: 20px;">
-            <strong>Progress: </strong><span id="progressPercent">0%</span>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
-        </div>
-        
-        <div id="warningBox"></div>
-        
-        <div class="section-title">⏰ Sleep Time Calculator</div>
-        <p style="color: #666; margin-bottom: 15px;">How much sleep time remains based on different pace targets:</p>
-        
-        <table class="sleep-table">
-            <thead>
-                <tr>
-                    <th>Target Pace (min/km)</th>
-                    <th>Time to Complete Remaining Distance</th>
-                    <th>Sleep Time Remaining</th>
-                </tr>
-            </thead>
-            <tbody id="sleepTableBody">
-                <tr><td colspan="3" style="text-align: center; color: #666;">Enter distance and click update to see sleep calculations</td></tr>
-            </tbody>
-        </table>
     </div>
     
     <script>
@@ -399,27 +271,29 @@
         // Start time: May 5, 2026 @ 20:07:55 CEST
         const START_TIME = new Date('2026-05-05T20:07:55+02:00');
         
+        // URL to fetch covered distance from backend
+        const BACKEND_URL = 'https://raw.githubusercontent.com/Runnatio/ARDA-Performance-Center/main/distance.json';
+        
+        let lastUpdateTime = null;
+        
         function getElapsedTime() {
             const now = new Date();
             const diff = now - START_TIME;
-            const hours = diff / (1000 * 60 * 60); // Convert milliseconds to hours
+            const hours = diff / (1000 * 60 * 60);
             return hours;
         }
         
         function kmhToMinKm(kmh) {
-            // Convert km/h to min/km
             if (kmh <= 0) return 0;
             return 60 / kmh;
         }
         
         function minKmToKmh(minKm) {
-            // Convert min/km to km/h
             if (minKm <= 0) return 0;
             return 60 / minKm;
         }
         
         function formatPace(minKm) {
-            // Convert decimal min/km to MM:SS format
             if (minKm <= 0) return '0:00';
             const minutes = Math.floor(minKm);
             const seconds = Math.round((minKm - minutes) * 60);
@@ -438,24 +312,44 @@
             document.getElementById('autoElapsedTime').textContent = elapsedTime.toFixed(2);
         }
         
-        function calculateStats() {
+        function updateLastUpdated() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            lastUpdateTime = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('lastUpdated').textContent = lastUpdateTime;
+        }
+        
+        async function fetchCoveredDistance() {
+            try {
+                const response = await fetch(BACKEND_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.distance;
+            } catch (error) {
+                console.error('Error fetching distance:', error);
+                return null;
+            }
+        }
+        
+        function renderStats(coveredDistance) {
             const elapsedTime = getElapsedTime();
-            const coveredDistance = parseFloat(document.getElementById('coveredDistance').value) || 0;
             
-            // Validate inputs
-            if (coveredDistance < 0) {
-                alert('Please enter a valid positive number for distance');
+            // Validate
+            if (coveredDistance < 0 || coveredDistance > TOTAL_DISTANCE || elapsedTime > TOTAL_TIME) {
+                let errorMsg = '';
+                if (coveredDistance < 0) errorMsg = 'Invalid distance (negative)';
+                else if (coveredDistance > TOTAL_DISTANCE) errorMsg = `Distance exceeds 600km (${coveredDistance}km)`;
+                else if (elapsedTime > TOTAL_TIME) errorMsg = 'Time limit exceeded! The race is over.';
+                
+                const errorBox = document.getElementById('errorBox');
+                errorBox.innerHTML = `<div class="error">⚠️ ${errorMsg}</div>`;
                 return;
-            }
-            
-            if (coveredDistance > TOTAL_DISTANCE) {
-                alert('Covered distance cannot exceed 600km');
-                return;
-            }
-            
-            if (elapsedTime > TOTAL_TIME) {
-                alert('Time limit exceeded! The race is over.');
-                return;
+            } else {
+                document.getElementById('errorBox').innerHTML = '';
             }
             
             // Calculations
@@ -468,10 +362,10 @@
             const neededPaceKmh = timeRemaining > 0 ? distanceRemaining / timeRemaining : 0;
             const neededPaceMinKm = timeRemaining > 0 ? kmhToMinKm(neededPaceKmh) : 0;
             
-            const paceDifference = neededPaceMinKm - TARGET_PACE_MIN_KM; // Positive = need to slow down, Negative = need to speed up
+            const paceDifference = neededPaceMinKm - TARGET_PACE_MIN_KM;
             const progressPercent = (coveredDistance / TOTAL_DISTANCE) * 100;
             
-            // Determine pace status (inverted logic for min/km: higher is slower)
+            // Determine pace status
             let paceStatus = 'On Target';
             let paceClass = '—';
             
@@ -486,81 +380,158 @@
                 paceClass = 'on-pace';
             }
             
-            // Update stat cards - use MM:SS format
-            document.getElementById('currentPace').textContent = formatPace(currentPaceMinKm);
-            document.getElementById('requiredPace').textContent = formatPace(neededPaceMinKm);
-            document.getElementById('timeRemaining').textContent = timeRemaining.toFixed(2);
-            document.getElementById('distanceRemaining').textContent = distanceRemaining.toFixed(1);
+            // Generate HTML
+            let sleepTableHTML = '';
+            for (let pace = 7; pace <= 11; pace += 1) {
+                const timeToComplete = (distanceRemaining * pace) / 60;
+                const sleepTime = timeRemaining - timeToComplete;
+                const isHighlight = pace === Math.round(neededPaceMinKm) ? 'sleep-highlight' : '';
+                
+                sleepTableHTML += `
+                    <tr class="${isHighlight}">
+                        <td>${pace.toFixed(0)}:00</td>
+                        <td>${formatTime(timeToComplete)}</td>
+                        <td>${sleepTime > 0 ? formatTime(sleepTime) : 'N/A (overtime)'}</td>
+                    </tr>
+                `;
+            }
             
-            // Update table - use MM:SS format for pace
-            document.getElementById('tableDistanceCovered').textContent = coveredDistance.toFixed(1) + ' km';
-            document.getElementById('tableTimeUsed').textContent = elapsedTime.toFixed(2) + ' h';
-            document.getElementById('tableNeededPace').textContent = formatPace(neededPaceMinKm) + ' min/km';
-            document.getElementById('tablePaceDifference').textContent = (paceDifference >= 0 ? '+' : '') + formatPace(Math.abs(paceDifference)) + ' min/km';
+            let warningHTML = '';
+            if (coveredDistance >= TOTAL_DISTANCE) {
+                warningHTML = `<div class="warning-section" style="background: #d4edda; border-left-color: #28a745; color: #155724;">✓ FINISHED! Total time: ${formatTime(elapsedTime)}</div>`;
+            } else if (elapsedTime >= TOTAL_TIME) {
+                warningHTML = `<div class="warning-section" style="background: #f8d7da; border-left-color: #dc3545; color: #721c24;">✗ TIME'S UP! Distance completed: ${coveredDistance.toFixed(1)} km</div>`;
+            } else if (neededPaceMinKm > TARGET_PACE_MIN_KM * 1.1) {
+                warningHTML = `<div class="warning-section">⚠️ WARNING: Need to increase pace to ${formatPace(neededPaceMinKm)} min/km to finish on time!</div>`;
+            }
             
-            // Update status cells
             const distanceStatus = coveredDistance >= (minKmToKmh(TARGET_PACE_MIN_KM) * elapsedTime) ? 'Ahead' : coveredDistance <= (minKmToKmh(TARGET_PACE_MIN_KM) * elapsedTime) ? 'Behind' : 'On Time';
             const timeStatus = elapsedTime <= (coveredDistance / minKmToKmh(TARGET_PACE_MIN_KM)) ? 'Ahead' : 'Behind';
             
-            document.getElementById('tableDistanceStatus').textContent = distanceStatus;
-            document.getElementById('tableTimeStatus').textContent = timeStatus;
-            document.getElementById('tablePaceStatus').textContent = paceStatus;
-            document.getElementById('tablePaceClass').className = paceClass;
+            const html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Current Pace</div>
+                        <div class="stat-value">${formatPace(currentPaceMinKm)}</div>
+                        <div class="stat-unit">min/km</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Required Pace</div>
+                        <div class="stat-value">${formatPace(neededPaceMinKm)}</div>
+                        <div class="stat-unit">min/km</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Time Remaining</div>
+                        <div class="stat-value">${timeRemaining.toFixed(2)}</div>
+                        <div class="stat-unit">hours</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Distance Remaining</div>
+                        <div class="stat-value">${distanceRemaining.toFixed(1)}</div>
+                        <div class="stat-unit">km</div>
+                    </div>
+                </div>
+                
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Total Distance Goal</td>
+                            <td>600.0 km</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Total Time Limit</td>
+                            <td>96 hours</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Target Average Pace</td>
+                            <td>9:36 min/km</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Distance Covered</td>
+                            <td>${coveredDistance.toFixed(1)} km</td>
+                            <td>${distanceStatus}</td>
+                        </tr>
+                        <tr>
+                            <td>Time Used</td>
+                            <td>${elapsedTime.toFixed(2)} h</td>
+                            <td>${timeStatus}</td>
+                        </tr>
+                        <tr>
+                            <td>Needed Pace for Remaining Distance</td>
+                            <td>${formatPace(neededPaceMinKm)} min/km</td>
+                            <td class="${paceClass}">${paceStatus}</td>
+                        </tr>
+                        <tr>
+                            <td>Pace Difference</td>
+                            <td>${(paceDifference >= 0 ? '+' : '')}${formatPace(Math.abs(paceDifference))} min/km</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="margin-bottom: 20px;">
+                    <strong>Progress: </strong><span>${progressPercent.toFixed(1)}%</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                </div>
+                
+                ${warningHTML}
+                
+                <div class="section-title">⏰ Sleep Time Calculator</div>
+                <p style="color: #666; margin-bottom: 15px;">How much sleep time remains based on different pace targets:</p>
+                
+                <table class="sleep-table">
+                    <thead>
+                        <tr>
+                            <th>Target Pace (min/km)</th>
+                            <th>Time to Complete Remaining Distance</th>
+                            <th>Sleep Time Remaining</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sleepTableHTML}
+                    </tbody>
+                </table>
+            `;
             
-            // Update progress
-            document.getElementById('progressPercent').textContent = progressPercent.toFixed(1) + '%';
-            document.getElementById('progressFill').style.width = progressPercent + '%';
-            
-            // Update warning box
-            const warningBox = document.getElementById('warningBox');
-            warningBox.innerHTML = '';
-            
-            if (coveredDistance >= TOTAL_DISTANCE) {
-                warningBox.innerHTML = '<div class="warning-section" style="background: #d4edda; border-left-color: #28a745; color: #155724;">✓ FINISHED! Total time: ' + formatTime(elapsedTime) + '</div>';
-            } else if (elapsedTime >= TOTAL_TIME) {
-                warningBox.innerHTML = '<div class="warning-section" style="background: #f8d7da; border-left-color: #dc3545; color: #721c24;">✗ TIME\'S UP! Distance completed: ' + coveredDistance.toFixed(1) + ' km</div>';
-            } else if (neededPaceMinKm > TARGET_PACE_MIN_KM * 1.1) {
-                warningBox.innerHTML = '<div class="warning-section">⚠️ WARNING: Need to increase pace to ' + formatPace(neededPaceMinKm) + ' min/km to finish on time!</div>';
-            }
-            
-            // Update sleep table
-            updateSleepTable(distanceRemaining, timeRemaining);
+            document.getElementById('statsContainer').innerHTML = html;
         }
         
-        function updateSleepTable(distanceRemaining, timeRemaining) {
-            const tbody = document.getElementById('sleepTableBody');
-            tbody.innerHTML = '';
-            
-            // Generate rows for 7 to 11 min/km in 1 min/km steps
-            for (let pace = 7; pace <= 11; pace += 1) {
-                const timeToComplete = (distanceRemaining * pace) / 60; // time in hours
-                const sleepTime = timeRemaining - timeToComplete; // sleep time in hours
-                
-                const row = document.createElement('tr');
-                
-                // Highlight if this is close to the required pace
-                const requiredPaceValue = parseFloat(document.getElementById('tableNeededPace').textContent);
-                if (pace === Math.round(requiredPaceValue)) {
-                    row.classList.add('sleep-highlight');
-                }
-                
-                row.innerHTML = `
-                    <td>${pace.toFixed(0)}:00</td>
-                    <td>${formatTime(timeToComplete)}</td>
-                    <td>${sleepTime > 0 ? formatTime(sleepTime) : 'N/A (overtime)'}</td>
+        async function loadAndDisplayStats() {
+            const distance = await fetchCoveredDistance();
+            if (distance !== null) {
+                updateLastUpdated();
+                renderStats(distance);
+            } else {
+                document.getElementById('statsContainer').innerHTML = `
+                    <div class="error">
+                        ⚠️ Unable to load distance data from backend. Please check if <code>distance.json</code> exists in the repository.
+                    </div>
                 `;
-                
-                tbody.appendChild(row);
             }
         }
         
-        // Update elapsed time display every second
+        // Update elapsed time every second
         setInterval(updateElapsedTimeDisplay, 1000);
         
-        // Initialize with default values on page load
+        // Load and display stats every 5 seconds
+        setInterval(loadAndDisplayStats, 5000);
+        
+        // Initial load
         window.addEventListener('load', () => {
             updateElapsedTimeDisplay();
-            calculateStats();
+            loadAndDisplayStats();
         });
     </script>
 </body>
