@@ -325,7 +325,7 @@
             try {
                 // Add cache-busting query parameter with current timestamp
                 const timestamp = new Date().getTime();
-                const url = `${BACKEND_URL}?t=${timestamp}`;
+                const url = `https://raw.githubusercontent.com/Runnatio/ARDA-Performance-Center/main/distance.json`;
                 
                 const response = await fetch(url, {
                     cache: 'no-store',
