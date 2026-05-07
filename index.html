@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARDA Performance Center - Live Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .stat-unit {
+            font-size: 0.6em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        .performance-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+        
+        .performance-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+        }
+        
+        .performance-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .on-pace {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .behind-pace {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .ahead-pace {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .warning-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #856404;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 600px) {
+            .input-section,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .stat-value {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏃 ARDA Performance Center</h1>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="elapsedTime">Elapsed Time (hours)</label>
+                <input type="number" id="elapsedTime" placeholder="0" min="0" max="96" step="0.25">
+            </div>
+            <div class="input-group">
+                <label for="coveredDistance">Covered Distance (km)</label>
+                <input type="number" id="coveredDistance" placeholder="0" min="0" max="600" step="0.1">
+            </div>
+            <button onclick="calculateStats()">Update Stats</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Current Average Pace</div>
+                <div class="stat-value" id="currentPace">0.00</div>
+                <div class="stat-unit">km/h</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Required Average Pace</div>
+                <div class="stat-value" id="requiredPace">6.25</div>
+                <div class="stat-unit">km/h</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Time Remaining</div>
+                <div class="stat-value" id="timeRemaining">96.00</div>
+                <div class="stat-unit">hours</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Distance Remaining</div>
+                <div class="stat-value" id="distanceRemaining">600.0</div>
+                <div class="stat-unit">km</div>
+            </div>
+        </div>
+        
+        <table class="performance-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Total Distance Goal</td>
+                    <td>600.0 km</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>Total Time Limit</td>
+                    <td>96 hours</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>Target Average Pace</td>
+                    <td>6.25 km/h</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td>Distance Covered</td>
+                    <td id="tableDistanceCovered">0 km</td>
+                    <td id="tableDistanceStatus">—</td>
+                </tr>
+                <tr>
+                    <td>Time Used</td>
+                    <td id="tableTimeUsed">0 h</td>
+                    <td id="tableTimeStatus">—</td>
+                </tr>
+                <tr>
+                    <td>Needed Pace for Remaining Distance</td>
+                    <td id="tableNeededPace">6.25 km/h</td>
+                    <td id="tablePaceStatus">On Target</td>
+                </tr>
+                <tr>
+                    <td>Pace Difference</td>
+                    <td id="tablePaceDifference">0.00 km/h</td>
+                    <td id="tablePaceClass">—</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="margin-bottom: 20px;">
+            <strong>Progress: </strong><span id="progressPercent">0%</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div id="warningBox"></div>
+    </div>
+    
+    <script>
+        const TOTAL_DISTANCE = 600; // km
+        const TOTAL_TIME = 96; // hours
+        const TARGET_PACE = TOTAL_DISTANCE / TOTAL_TIME; // 6.25 km/h
+        
+        function calculateStats() {
+            const elapsedTime = parseFloat(document.getElementById('elapsedTime').value) || 0;
+            const coveredDistance = parseFloat(document.getElementById('coveredDistance').value) || 0;
+            
+            // Validate inputs
+            if (elapsedTime < 0 || coveredDistance < 0) {
+                alert('Please enter valid positive numbers');
+                return;
+            }
+            
+            if (coveredDistance > TOTAL_DISTANCE) {
+                alert('Covered distance cannot exceed 600km');
+                return;
+            }
+            
+            if (elapsedTime > TOTAL_TIME) {
+                alert('Elapsed time cannot exceed 96 hours');
+                return;
+            }
+            
+            // Calculations
+            const currentPace = elapsedTime > 0 ? coveredDistance / elapsedTime : 0;
+            const timeRemaining = TOTAL_TIME - elapsedTime;
+            const distanceRemaining = TOTAL_DISTANCE - coveredDistance;
+            const neededPace = timeRemaining > 0 ? distanceRemaining / timeRemaining : 0;
+            const paceDifference = neededPace - TARGET_PACE;
+            const progressPercent = (coveredDistance / TOTAL_DISTANCE) * 100;
+            
+            // Determine pace status
+            let paceStatus = 'On Target';
+            let paceClass = '—';
+            
+            if (neededPace > TARGET_PACE * 1.05) {
+                paceStatus = 'Behind Pace - Need to Speed Up!';
+                paceClass = 'behind-pace';
+            } else if (neededPace < TARGET_PACE * 0.95) {
+                paceStatus = 'Ahead of Pace - Good Job!';
+                paceClass = 'ahead-pace';
+            } else {
+                paceStatus = 'On Target';
+                paceClass = 'on-pace';
+            }
+            
+            // Update stat cards
+            document.getElementById('currentPace').textContent = currentPace.toFixed(2);
+            document.getElementById('requiredPace').textContent = neededPace.toFixed(2);
+            document.getElementById('timeRemaining').textContent = timeRemaining.toFixed(2);
+            document.getElementById('distanceRemaining').textContent = distanceRemaining.toFixed(1);
+            
+            // Update table
+            document.getElementById('tableDistanceCovered').textContent = coveredDistance.toFixed(1) + ' km';
+            document.getElementById('tableTimeUsed').textContent = elapsedTime.toFixed(2) + ' h';
+            document.getElementById('tableNeededPace').textContent = neededPace.toFixed(2) + ' km/h';
+            document.getElementById('tablePaceDifference').textContent = (paceDifference >= 0 ? '+' : '') + paceDifference.toFixed(2) + ' km/h';
+            
+            // Update status cells
+            const distanceStatus = coveredDistance >= (TARGET_PACE * elapsedTime) ? 'Ahead' : coveredDistance <= (TARGET_PACE * elapsedTime) ? 'Behind' : 'On Time';
+            const timeStatus = elapsedTime <= (coveredDistance / TARGET_PACE) ? 'Ahead' : 'Behind';
+            
+            document.getElementById('tableDistanceStatus').textContent = distanceStatus;
+            document.getElementById('tableTimeStatus').textContent = timeStatus;
+            document.getElementById('tablePaceStatus').textContent = paceStatus;
+            document.getElementById('tablePaceClass').className = paceClass;
+            
+            // Update progress
+            document.getElementById('progressPercent').textContent = progressPercent.toFixed(1) + '%';
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            // Update warning box
+            const warningBox = document.getElementById('warningBox');
+            warningBox.innerHTML = '';
+            
+            if (coveredDistance >= TOTAL_DISTANCE) {
+                warningBox.innerHTML = '<div class="warning-section" style="background: #d4edda; border-left-color: #28a745; color: #155724;">✓ FINISHED! Total time: ' + elapsedTime.toFixed(2) + ' hours</div>';
+            } else if (elapsedTime >= TOTAL_TIME) {
+                warningBox.innerHTML = '<div class="warning-section" style="background: #f8d7da; border-left-color: #dc3545; color: #721c24;">✗ TIME'S UP! Distance completed: ' + coveredDistance.toFixed(1) + ' km</div>';
+            } else if (neededPace > TARGET_PACE * 1.1) {
+                warningBox.innerHTML = '<div class="warning-section">⚠️ WARNING: Need to increase pace to ' + neededPace.toFixed(2) + ' km/h to finish on time!</div>';
+            }
+        }
+        
+        // Initialize with default values on page load
+        window.addEventListener('load', () => {
+            calculateStats();
+        });
+    </script>
+</body>
+</html>
