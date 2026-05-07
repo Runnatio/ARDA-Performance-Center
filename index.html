@@ -316,19 +316,19 @@
 
     const date = new Date(timestamp);
 
-    const formatted =
-    date.toLocaleString('de-CH', {
+    const formatted = new Intl.DateTimeFormat('de-CH', {
         timeZone: 'Europe/Zurich',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }) + ' CEST';
+        hour12: false,
+        timeZoneName: 'short'
+    }).format(date);
 
-    document.getElementById('lastUpdated').textContent =
-        formatted;
+    document.getElementById('lastUpdated').textContent = formatted;
 }
         
         async function fetchCoveredDistance() {
