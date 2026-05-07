@@ -272,7 +272,7 @@
         const START_TIME = new Date('2026-05-05T20:07:55+02:00');
         
         // URL to fetch covered distance from backend
-        const BACKEND_URL = 'https://api.jsonbin.io/v3/b/69fc9233adc21f119a685c4c/latest';
+        const BACKEND_URL = 'https://api.jsonbin.io/v3/b/69fc9233adc21f119a685c4c';
         
         
         
@@ -356,9 +356,15 @@
         }
 
         // Use backend update timestamp
-        const updatedAt =
-            data.metadata.updatedAt ||
-            data.metadata.createdAt;
+        
+    const updatedAt = data.metadata?.updatedAt;   
+
+    if (updatedAt) {
+        updateLastUpdated(updatedAt);
+    } else {
+        console.warn('No updatedAt found in metadata');
+    }
+
 
         updateLastUpdated(updatedAt);
 
