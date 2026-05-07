@@ -323,7 +323,18 @@
         
         async function fetchCoveredDistance() {
             try {
-                const response = await fetch(BACKEND_URL);
+                // Add cache-busting query parameter with current timestamp
+                const timestamp = new Date().getTime();
+                const url = `${BACKEND_URL}?t=${timestamp}`;
+                
+                const response = await fetch(url, {
+                    cache: 'no-store',
+                    headers: {
+                        'Pragma': 'no-cache',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    }
+                });
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
