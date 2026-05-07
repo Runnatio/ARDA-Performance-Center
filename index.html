@@ -107,6 +107,7 @@
         .stat-value {
             font-size: 1.8em;
             font-weight: bold;
+            font-family: 'Courier New', monospace;
         }
         
         .stat-unit {
@@ -136,6 +137,7 @@
             padding: 15px;
             border-bottom: 1px solid #eee;
             font-size: 0.95em;
+            font-family: 'Courier New', monospace;
         }
         
         .performance-table tr:hover {
@@ -205,6 +207,7 @@
             text-align: center;
             border-bottom: 1px solid #ddd;
             font-size: 0.95em;
+            font-family: 'Courier New', monospace;
         }
         
         .sleep-table tr:hover {
@@ -295,12 +298,12 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Current Pace</div>
-                <div class="stat-value" id="currentPace">0.00</div>
+                <div class="stat-value" id="currentPace">0:00</div>
                 <div class="stat-unit">min/km</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Required Pace</div>
-                <div class="stat-value" id="requiredPace">9.60</div>
+                <div class="stat-value" id="requiredPace">9:36</div>
                 <div class="stat-unit">min/km</div>
             </div>
             <div class="stat-card">
@@ -336,7 +339,7 @@
                 </tr>
                 <tr>
                     <td>Target Average Pace</td>
-                    <td>9.60 min/km</td>
+                    <td>9:36 min/km</td>
                     <td>—</td>
                 </tr>
                 <tr>
@@ -351,12 +354,12 @@
                 </tr>
                 <tr>
                     <td>Needed Pace for Remaining Distance</td>
-                    <td id="tableNeededPace">9.60 min/km</td>
+                    <td id="tableNeededPace">9:36 min/km</td>
                     <td id="tablePaceStatus">On Target</td>
                 </tr>
                 <tr>
                     <td>Pace Difference</td>
-                    <td id="tablePaceDifference">0.00 min/km</td>
+                    <td id="tablePaceDifference">0:00 min/km</td>
                     <td id="tablePaceClass">—</td>
                 </tr>
             </tbody>
@@ -413,6 +416,14 @@
             // Convert min/km to km/h
             if (minKm <= 0) return 0;
             return 60 / minKm;
+        }
+        
+        function formatPace(minKm) {
+            // Convert decimal min/km to MM:SS format
+            if (minKm <= 0) return '0:00';
+            const minutes = Math.floor(minKm);
+            const seconds = Math.round((minKm - minutes) * 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
         
         function formatTime(hours) {
@@ -475,17 +486,17 @@
                 paceClass = 'on-pace';
             }
             
-            // Update stat cards
-            document.getElementById('currentPace').textContent = currentPaceMinKm.toFixed(2);
-            document.getElementById('requiredPace').textContent = neededPaceMinKm.toFixed(2);
+            // Update stat cards - use MM:SS format
+            document.getElementById('currentPace').textContent = formatPace(currentPaceMinKm);
+            document.getElementById('requiredPace').textContent = formatPace(neededPaceMinKm);
             document.getElementById('timeRemaining').textContent = timeRemaining.toFixed(2);
             document.getElementById('distanceRemaining').textContent = distanceRemaining.toFixed(1);
             
-            // Update table
+            // Update table - use MM:SS format for pace
             document.getElementById('tableDistanceCovered').textContent = coveredDistance.toFixed(1) + ' km';
             document.getElementById('tableTimeUsed').textContent = elapsedTime.toFixed(2) + ' h';
-            document.getElementById('tableNeededPace').textContent = neededPaceMinKm.toFixed(2) + ' min/km';
-            document.getElementById('tablePaceDifference').textContent = (paceDifference >= 0 ? '+' : '') + paceDifference.toFixed(2) + ' min/km';
+            document.getElementById('tableNeededPace').textContent = formatPace(neededPaceMinKm) + ' min/km';
+            document.getElementById('tablePaceDifference').textContent = (paceDifference >= 0 ? '+' : '') + formatPace(Math.abs(paceDifference)) + ' min/km';
             
             // Update status cells
             const distanceStatus = coveredDistance >= (minKmToKmh(TARGET_PACE_MIN_KM) * elapsedTime) ? 'Ahead' : coveredDistance <= (minKmToKmh(TARGET_PACE_MIN_KM) * elapsedTime) ? 'Behind' : 'On Time';
@@ -509,7 +520,7 @@
             } else if (elapsedTime >= TOTAL_TIME) {
                 warningBox.innerHTML = '<div class="warning-section" style="background: #f8d7da; border-left-color: #dc3545; color: #721c24;">✗ TIME\'S UP! Distance completed: ' + coveredDistance.toFixed(1) + ' km</div>';
             } else if (neededPaceMinKm > TARGET_PACE_MIN_KM * 1.1) {
-                warningBox.innerHTML = '<div class="warning-section">⚠️ WARNING: Need to increase pace to ' + neededPaceMinKm.toFixed(2) + ' min/km to finish on time!</div>';
+                warningBox.innerHTML = '<div class="warning-section">⚠️ WARNING: Need to increase pace to ' + formatPace(neededPaceMinKm) + ' min/km to finish on time!</div>';
             }
             
             // Update sleep table
@@ -528,12 +539,13 @@
                 const row = document.createElement('tr');
                 
                 // Highlight if this is close to the required pace
-                if (pace === Math.round(parseFloat(document.getElementById('tableNeededPace').textContent))) {
+                const requiredPaceValue = parseFloat(document.getElementById('tableNeededPace').textContent);
+                if (pace === Math.round(requiredPaceValue)) {
                     row.classList.add('sleep-highlight');
                 }
                 
                 row.innerHTML = `
-                    <td>${pace.toFixed(0)}</td>
+                    <td>${pace.toFixed(0)}:00</td>
                     <td>${formatTime(timeToComplete)}</td>
                     <td>${sleepTime > 0 ? formatTime(sleepTime) : 'N/A (overtime)'}</td>
                 `;
