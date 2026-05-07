@@ -386,10 +386,10 @@
             let paceStatus = 'On Target';
             let paceClass = '—';
             
-            if (neededPaceMinKm > TARGET_PACE_MIN_KM * 1.05) {
+            if (neededPaceMinKm < TARGET_PACE_MIN_KM * 1.05) {
                 paceStatus = 'Behind Pace - Need to Speed Up!';
                 paceClass = 'behind-pace';
-            } else if (neededPaceMinKm < TARGET_PACE_MIN_KM * 0.95) {
+            } else if (neededPaceMinKm > TARGET_PACE_MIN_KM * 0.95) {
                 paceStatus = 'Ahead of Pace - Good Job!';
                 paceClass = 'ahead-pace';
             } else {
