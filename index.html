@@ -33,8 +33,17 @@
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-size: 2em;
+        }
+        
+        .start-info {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
         }
         
         .input-section {
@@ -210,17 +219,19 @@
 <body>
     <div class="container">
         <h1>🏃 ARDA Performance Center</h1>
+        <div class="start-info">
+            <strong>Start Time:</strong> May 5, 2026 @ 20:07:55 CEST<br>
+            <strong>Elapsed Time (Auto-calculated):</strong> <span id="autoElapsedTime">0.00</span> hours
+        </div>
         
         <div class="input-section">
-            <div class="input-group">
-                <label for="elapsedTime">Elapsed Time (hours)</label>
-                <input type="number" id="elapsedTime" placeholder="0" min="0" max="96" step="0.25">
-            </div>
             <div class="input-group">
                 <label for="coveredDistance">Covered Distance (km)</label>
                 <input type="number" id="coveredDistance" placeholder="0" min="0" max="600" step="0.1">
             </div>
-            <button onclick="calculateStats()">Update Stats</button>
+            <div style="display: flex; align-items: flex-end;">
+                <button onclick="calculateStats()">Update Stats</button>
+            </div>
         </div>
         
         <div class="stats-grid">
@@ -308,13 +319,28 @@
         const TOTAL_TIME = 96; // hours
         const TARGET_PACE = TOTAL_DISTANCE / TOTAL_TIME; // 6.25 km/h
         
+        // Start time: May 5, 2026 @ 20:07:55 CEST
+        const START_TIME = new Date('2026-05-05T20:07:55+02:00');
+        
+        function getElapsedTime() {
+            const now = new Date();
+            const diff = now - START_TIME;
+            const hours = diff / (1000 * 60 * 60); // Convert milliseconds to hours
+            return hours;
+        }
+        
+        function updateElapsedTimeDisplay() {
+            const elapsedTime = getElapsedTime();
+            document.getElementById('autoElapsedTime').textContent = elapsedTime.toFixed(2);
+        }
+        
         function calculateStats() {
-            const elapsedTime = parseFloat(document.getElementById('elapsedTime').value) || 0;
+            const elapsedTime = getElapsedTime();
             const coveredDistance = parseFloat(document.getElementById('coveredDistance').value) || 0;
             
             // Validate inputs
-            if (elapsedTime < 0 || coveredDistance < 0) {
-                alert('Please enter valid positive numbers');
+            if (coveredDistance < 0) {
+                alert('Please enter a valid positive number for distance');
                 return;
             }
             
@@ -324,7 +350,7 @@
             }
             
             if (elapsedTime > TOTAL_TIME) {
-                alert('Elapsed time cannot exceed 96 hours');
+                alert('Time limit exceeded! The race is over.');
                 return;
             }
             
@@ -383,14 +409,18 @@
             if (coveredDistance >= TOTAL_DISTANCE) {
                 warningBox.innerHTML = '<div class="warning-section" style="background: #d4edda; border-left-color: #28a745; color: #155724;">✓ FINISHED! Total time: ' + elapsedTime.toFixed(2) + ' hours</div>';
             } else if (elapsedTime >= TOTAL_TIME) {
-                warningBox.innerHTML = '<div class="warning-section" style="background: #f8d7da; border-left-color: #dc3545; color: #721c24;">✗ TIME'S UP! Distance completed: ' + coveredDistance.toFixed(1) + ' km</div>';
+                warningBox.innerHTML = '<div class="warning-section" style="background: #f8d7da; border-left-color: #dc3545; color: #721c24;">✗ TIME\'S UP! Distance completed: ' + coveredDistance.toFixed(1) + ' km</div>';
             } else if (neededPace > TARGET_PACE * 1.1) {
                 warningBox.innerHTML = '<div class="warning-section">⚠️ WARNING: Need to increase pace to ' + neededPace.toFixed(2) + ' km/h to finish on time!</div>';
             }
         }
         
+        // Update elapsed time display every second
+        setInterval(updateElapsedTimeDisplay, 1000);
+        
         // Initialize with default values on page load
         window.addEventListener('load', () => {
+            updateElapsedTimeDisplay();
             calculateStats();
         });
     </script>
