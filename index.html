@@ -317,14 +317,15 @@
     const date = new Date(timestamp);
 
     const formatted =
-        date.toLocaleString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+    date.toLocaleString('en-GB', {
+        timeZone: 'Europe/Zurich',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }) + ' CEST';
 
     document.getElementById('lastUpdated').textContent =
         formatted;
