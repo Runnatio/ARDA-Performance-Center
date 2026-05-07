@@ -272,7 +272,7 @@
         const START_TIME = new Date('2026-05-05T20:07:55+02:00');
         
         // URL to fetch covered distance from backend
-        const BACKEND_URL = 'https://raw.githubusercontent.com/Runnatio/ARDA-Performance-Center/main/distance.json';
+        const BACKEND_URL = 'https://cdn.jsdelivr.net/gh/Runnatio/ARDA-Performance-Center@main/distance.json';
         
         let lastUpdateTime = null;
         
@@ -322,29 +322,35 @@
         }
         
         async function fetchCoveredDistance() {
-            try {
-                // Add cache-busting query parameter with current timestamp
-                const timestamp = new Date().getTime();
-                const url = `${BACKEND_URL}?t=${timestamp}`;
-                
-                const response = await fetch(url, {
-                    cache: 'no-store',
-                    headers: {
-                        'Pragma': 'no-cache',
-                        'Cache-Control': 'no-cache, no-store, must-revalidate'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                return data.distance;
-            } catch (error) {
-                console.error('Error fetching distance:', error);
-                return null;
-            }
+    try {
+        const timestamp = Date.now();
+
+        const response = await fetch(`${BACKEND_URL}?t=${timestamp}`, {
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
+
+        const text = await response.text();
+
+        // Debugging
+        console.log('RAW RESPONSE:', text);
+
+        const data = JSON.parse(text);
+
+        if (typeof data.distance !== 'number') {
+            throw new Error('distance field missing or invalid');
+        }
+
+        return data.distance;
+
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null;
+    }
+}
         
         function renderStats(coveredDistance) {
             const elapsedTime = getElapsedTime();
