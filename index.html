@@ -252,9 +252,9 @@
             <strong>Elapsed Time (Auto-calculated):</strong> <span id="autoElapsedTime">0.00</span> hours
         </div>
         
-        <div class="last-updated">
-            Last Updated: <span id="lastUpdated">Never</span>
-        </div>
+         <div class="last-updated">
+             Last Updated: <span id="lastUpdated">Never</span>
+         </div>
         
         <div id="errorBox"></div>
         
@@ -357,8 +357,8 @@
 
         // Use backend update timestamp
         const updatedAt =
-            data.metadata.updatedAt ||
-            data.metadata.createdAt;
+            data.record.updatedAt ||
+            data.metadata.updatedAt;
 
         updateLastUpdated(updatedAt);
 
