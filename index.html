@@ -117,19 +117,123 @@
             background: #f8f9fa;
         }
         
+        .progress-section {
+            margin-bottom: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .progress-section h3 {
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
         .progress-bar {
             width: 100%;
-            height: 10px;
+            height: 15px;
             background: #eee;
             border-radius: 5px;
             overflow: hidden;
-            margin-top: 10px;
+            margin-bottom: 8px;
+            position: relative;
         }
         
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 5px;
+            font-size: 0.7em;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .pace-comparison-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .pace-comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .pace-item {
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .pace-item-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .pace-item-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: #333;
+        }
+        
+        .distance-progress {
+            border-left: 4px solid #3498db;
+        }
+        
+        .time-progress {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .status-ahead {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .status-behind {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .status-on-pace {
+            background: #cfe9ff;
+            color: #004085;
+            border: 2px solid #0066cc;
         }
         
         .on-pace {
@@ -227,6 +331,10 @@
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
             }
+            
+            .pace-comparison-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 600px) {
@@ -240,6 +348,10 @@
             
             .stat-value {
                 font-size: 1.4em;
+            }
+            
+            .pace-comparison-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -407,20 +519,33 @@
             
             const paceDifference = neededPaceMinKm - TARGET_PACE_MIN_KM;
             const progressPercent = (coveredDistance / TOTAL_DISTANCE) * 100;
+            const timeProgressPercent = (elapsedTime / TOTAL_TIME) * 100;
+            
+            // Calculate if runner is ahead or behind
+            const expectedDistanceAtPace = minKmToKmh(TARGET_PACE_MIN_KM) * elapsedTime;
+            const distanceDelta = coveredDistance - expectedDistanceAtPace;
             
             // Determine pace status
             let paceStatus = 'On Target';
             let paceClass = '—';
+            let statusBadgeClass = 'status-on-pace';
+            let statusIcon = '✓';
             
             if (neededPaceMinKm < TARGET_PACE_MIN_KM * 0.95) {
                 paceStatus = 'Behind Pace - Need to Speed Up!';
                 paceClass = 'behind-pace';
+                statusBadgeClass = 'status-behind';
+                statusIcon = '⚠️';
             } else if (neededPaceMinKm > TARGET_PACE_MIN_KM * 1.05) {
                 paceStatus = 'Ahead of Pace - Good Job!';
                 paceClass = 'ahead-pace';
+                statusBadgeClass = 'status-ahead';
+                statusIcon = '🎉';
             } else {
                 paceStatus = 'On Target';
                 paceClass = 'on-pace';
+                statusBadgeClass = 'status-on-pace';
+                statusIcon = '✓';
             }
             
             // Generate HTML
@@ -475,6 +600,50 @@
                     </div>
                 </div>
                 
+                <div class="pace-comparison-box">
+                    <h3>⚡ Pace Status</h3>
+                    <div class="pace-comparison-grid">
+                        <div class="pace-item" style="background: #f0f4ff;">
+                            <div class="pace-item-label">Expected Distance</div>
+                            <div class="pace-item-value">${expectedDistanceAtPace.toFixed(1)}</div>
+                            <div class="pace-item-label" style="font-size: 0.7em;">at target pace</div>
+                        </div>
+                        <div class="pace-item" style="background: #f9f9f9;">
+                            <div class="pace-item-label">Actual Distance</div>
+                            <div class="pace-item-value">${coveredDistance.toFixed(1)}</div>
+                            <div class="pace-item-label" style="font-size: 0.7em;">km</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div style="font-size: 1.1em; font-weight: bold; color: ${distanceDelta >= 0 ? '#28a745' : '#dc3545'};">
+                            ${distanceDelta >= 0 ? '+' : ''}${distanceDelta.toFixed(1)} km ${distanceDelta >= 0 ? 'AHEAD' : 'BEHIND'}
+                        </div>
+                        <span class="status-badge ${statusBadgeClass}">${statusIcon} ${paceStatus}</span>
+                    </div>
+                </div>
+                
+                <div class="progress-section distance-progress">
+                    <h3>📍 Distance Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progressPercent}%">${progressPercent.toFixed(1)}%</div>
+                    </div>
+                    <div class="progress-labels">
+                        <span>${coveredDistance.toFixed(1)} km</span>
+                        <span>${TOTAL_DISTANCE} km</span>
+                    </div>
+                </div>
+                
+                <div class="progress-section time-progress">
+                    <h3>⏱️ Time Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${timeProgressPercent}%">${timeProgressPercent.toFixed(1)}%</div>
+                    </div>
+                    <div class="progress-labels">
+                        <span>${formatTimeHHMM(elapsedTime)}</span>
+                        <span>${TOTAL_TIME} hours</span>
+                    </div>
+                </div>
+                
                 <table class="performance-table">
                     <thead>
                         <tr>
@@ -521,13 +690,6 @@
                         </tr>
                     </tbody>
                 </table>
-                
-                <div style="margin-bottom: 20px;">
-                    <strong>Progress: </strong><span>${progressPercent.toFixed(1)}%</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
-                    </div>
-                </div>
                 
                 ${warningHTML}
                 
