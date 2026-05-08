@@ -419,7 +419,7 @@
             
             // Generate HTML
             let sleepTableHTML = '';
-            for (let pace = 7; pace <= 11; pace += 1) {
+            for (let pace = 5; pace <= 9; pace += 1) {
                 const timeToComplete = (distanceRemaining * pace) / 60;
                 const sleepTime = timeRemaining - timeToComplete;
                 const isHighlight = pace === Math.round(neededPaceMinKm) ? 'sleep-highlight' : '';
