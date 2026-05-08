@@ -427,7 +427,7 @@
         
         function updateElapsedTimeDisplay() {
             const elapsedTime = getElapsedTime();
-            document.getElementById('autoElapsedTime').textContent = elapsedTime.toFixed(2);
+            document.getElementById('autoElapsedTime').textContent = formatTimeHHMM(elapsedTime);
         }
         
         function updateLastUpdated(timestamp) {
@@ -550,7 +550,7 @@
             
             // Generate HTML
             let sleepTableHTML = '';
-            for (let pace = 7; pace <= 11; pace += 1) {
+            for (let pace = 5; pace <= 11; pace += 1) {
                 const timeToComplete = (distanceRemaining * pace) / 60;
                 const sleepTime = timeRemaining - timeToComplete;
                 const isHighlight = pace === Math.round(neededPaceMinKm) ? 'sleep-highlight' : '';
@@ -590,8 +590,8 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Time Remaining</div>
-                        <div class="stat-value">${timeRemaining.toFixed(2)}</div>
-                        <div class="stat-unit">hours</div>
+                        <div class="stat-value">${formatTimeHHMM(timeRemaining)}</div>
+                        <div class="stat-unit">hh:mm</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Distance Remaining</div>
