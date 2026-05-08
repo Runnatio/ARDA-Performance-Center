@@ -307,6 +307,12 @@
             return `${h}h ${m}m ${s}s`;
         }
         
+        function formatTimeHHMM(hours) {
+            const h = Math.floor(hours);
+            const m = Math.round((hours - h) * 60);
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        }
+        
         function updateElapsedTimeDisplay() {
             const elapsedTime = getElapsedTime();
             document.getElementById('autoElapsedTime').textContent = elapsedTime.toFixed(2);
@@ -419,7 +425,7 @@
             
             // Generate HTML
             let sleepTableHTML = '';
-            for (let pace = 5; pace <= 9; pace += 1) {
+            for (let pace = 7; pace <= 11; pace += 1) {
                 const timeToComplete = (distanceRemaining * pace) / 60;
                 const sleepTime = timeRemaining - timeToComplete;
                 const isHighlight = pace === Math.round(neededPaceMinKm) ? 'sleep-highlight' : '';
@@ -500,7 +506,7 @@
                         </tr>
                         <tr>
                             <td>Time Used</td>
-                            <td>${elapsedTime.toFixed(2)} h</td>
+                            <td>${formatTimeHHMM(elapsedTime)}</td>
                             <td>${timeStatus}</td>
                         </tr>
                         <tr>
